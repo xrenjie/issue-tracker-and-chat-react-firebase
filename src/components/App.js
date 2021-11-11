@@ -9,7 +9,6 @@ import PrivateRoute from "./PrivateRoute";
 import { AuthProvider } from "../contexts/AuthContext";
 import Account from "./Account";
 import { DBProvider } from "../contexts/DBContext";
-import TechAccount from "./technician/TechAccount";
 import Navbar from "./Navbar";
 
 function App() {

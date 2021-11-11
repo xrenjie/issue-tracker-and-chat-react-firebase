@@ -4,13 +4,11 @@ import { useDB } from "../../contexts/DBContext";
 
 const NewRequest = ({ setShowNewRequest }) => {
   const { user, role } = useAuth();
-  const [issue, setIssue] = useState("");
   const {
     techGetNewRequest,
     setIsChanged,
     techRejectRequest,
     techAcceptRequest,
-    techGetPendingRequests,
   } = useDB();
   const [loading, setLoading] = useState(false);
   const [request, setRequest] = useState();
@@ -29,7 +27,7 @@ const NewRequest = ({ setShowNewRequest }) => {
       }
     }
     getData();
-  }, []);
+  }, [role, user.uid]);
 
   const handleAccept = async () => {
     setLoading(true);

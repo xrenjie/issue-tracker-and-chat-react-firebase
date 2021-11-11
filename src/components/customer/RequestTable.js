@@ -22,7 +22,7 @@ const RequestTable = () => {
     return () => {
       isMounted = false;
     };
-  }, [isChanged]);
+  }, [isChanged, setIsChanged]);
 
   const getRows = async () => {
     let req = await getRequests(user.uid);

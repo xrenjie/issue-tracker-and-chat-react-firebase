@@ -1,4 +1,4 @@
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useDB } from "../contexts/DBContext";
@@ -7,7 +7,7 @@ const Login = () => {
   const { getUser } = useDB();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, user, setRole, role } = useAuth();
+  const { login, setRole } = useAuth();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 

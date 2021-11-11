@@ -12,7 +12,7 @@ const CustAccount = () => {
 
   useEffect(() => {
     setEmail(user.email);
-  }, []);
+  }, [user.email]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,7 +65,8 @@ const CustAccount = () => {
               <input
                 id="newPassword"
                 name="newPassword"
-                type="newPassword"
+                type="password"
+                autoComplete="new-password"
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -78,8 +79,8 @@ const CustAccount = () => {
               <input
                 id="confirmNewPassword"
                 name="confirmNewPassword"
-                type="confirmNewPassword"
-                autoComplete="confirmNewPassword"
+                type="password"
+                autoComplete="new-password"
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
                 required
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -92,8 +93,8 @@ const CustAccount = () => {
               <input
                 id="currentPassword"
                 name="currentPassword"
-                type="currentPassword"
-                autoComplete="currentPassword"
+                type="password"
+                autoComplete="current-password"
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"

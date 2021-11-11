@@ -58,7 +58,7 @@ const Request = ({ setShowRequest }) => {
                 <input
                   id="issue"
                   name="issue"
-                  type="issue"
+                  type="text"
                   autoComplete="issue"
                   onChange={(e) => setIssue(e.target.value)}
                   required

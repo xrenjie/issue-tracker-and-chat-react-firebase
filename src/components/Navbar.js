@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
 const Navbar = () => {
-  const { user, logout, role } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {}, []);
 
