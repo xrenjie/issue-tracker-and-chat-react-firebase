@@ -74,17 +74,15 @@ const RequestTable = () => {
   };
 
   return (
-    <div>
-      <Table
-        should_export={false}
-        columns={getCols()}
-        rows={requests}
-        per_page={20}
-        bulk_select_options={["Delete"]}
-        bulk_select_button_text="Apply"
-        on_bulk_action={handleAction}
-      />
-    </div>
+    <Table
+      should_export={false}
+      columns={getCols()}
+      rows={requests}
+      per_page={20}
+      bulk_select_options={["Delete"]}
+      bulk_select_button_text="Apply"
+      on_bulk_action={handleAction}
+    />
   );
 };
 

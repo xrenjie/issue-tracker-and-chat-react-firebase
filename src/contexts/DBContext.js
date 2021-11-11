@@ -11,6 +11,9 @@ import {
   orderBy,
   limit,
   runTransaction,
+  setDoc,
+  getDoc,
+  collectionGroup,
 } from "firebase/firestore";
 
 export const DBContext = createContext();
@@ -24,13 +27,16 @@ export const DBProvider = ({ children }) => {
   // const [requests, setRequests] = useState([]);
 
   async function addNewRequest(request) {
-    const docRef = await addDoc(collection(db, "requests"), request);
+    const docRef = await addDoc(
+      collection(db, "users", request.uid, "requests"),
+      request
+    );
     return docRef.id;
   }
 
   async function getRequests(uid) {
     let requests = [];
-    const q = query(collection(db, "requests"), where("user", "==", uid));
+    const q = query(collection(db, "users", uid, "requests"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       let r = doc.data();
@@ -45,14 +51,16 @@ export const DBProvider = ({ children }) => {
   }
 
   async function newUser(user) {
-    const docRef = await addDoc(collection(db, "users"), user);
+    const docRef = await setDoc(doc(db, "users", user.uid), {
+      role: user.role,
+    });
     return docRef.id;
   }
 
   async function getUser(uid) {
-    const q = query(collection(db, "users"), where("uid", "==", uid));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs[0].data();
+    const docRef = doc(db, "users", uid);
+    const docSnapshot = await getDoc(docRef);
+    return docSnapshot.data();
   }
 
   async function techGetNewRequest(uid) {
@@ -60,21 +68,18 @@ export const DBProvider = ({ children }) => {
     try {
       await runTransaction(db, async (transaction) => {
         const q = query(
-          collection(db, "requests"),
+          collectionGroup(db, "requests"),
           orderBy("date"),
           where("status", "==", "new"),
-          where("tech", "==", "none"),
+          where("techUid", "==", "none"),
           limit(1)
         );
         const results = await getDocs(q);
         if (results.empty) return;
-
         request = results.docs[0];
-        if (request.data().tech === "none") {
-          transaction.update(results.docs[0].ref, { tech: uid });
-          console.log("updated");
+        if (request.data().techUid === "none") {
+          transaction.update(results.docs[0].ref, { techUid: uid });
         } else {
-          console.log("not updated");
           return Promise.reject({ message: "Get new requests failed", err: 1 });
         }
         return { message: "Success", err: -1 };
@@ -85,26 +90,26 @@ export const DBProvider = ({ children }) => {
     return request;
   }
 
-  async function techRejectRequest(reqId) {
-    const docRef = doc(db, "requests", reqId);
+  async function techRejectRequest(reqId, uid) {
+    const docRef = doc(db, "users", uid, "requests", reqId);
 
     await runTransaction(db, async (transaction) => {
       transaction.update(docRef, {
         status: "new",
-        tech: "none",
+        techUid: "none",
         techEmail: "none",
       });
     });
   }
 
-  async function techAcceptRequest(uid, email, reqId) {
-    const docRef = doc(db, "requests", reqId);
+  async function techAcceptRequest(techUid, techEmail, reqUid, reqId) {
+    const docRef = doc(db, "users", reqUid, "requests", reqId);
 
     await runTransaction(db, async (transaction) => {
       transaction.update(docRef, {
         status: "accepted",
-        tech: uid,
-        techEmail: email,
+        techUid: techUid,
+        techEmail: techEmail,
       });
     });
   }
@@ -112,8 +117,8 @@ export const DBProvider = ({ children }) => {
   async function techGetPendingRequests(uid) {
     let requests = [];
     const q = query(
-      collection(db, "requests"),
-      where("tech", "==", uid),
+      collectionGroup(db, "users"),
+      where("techUid", "==", uid),
       where("status", "==", "new")
     );
     const querySnapshot = await getDocs(q);
@@ -128,8 +133,8 @@ export const DBProvider = ({ children }) => {
   async function techGetAcceptedRequests(uid) {
     let requests = [];
     const q = query(
-      collection(db, "requests"),
-      where("tech", "==", uid),
+      collectionGroup(db, "requests"),
+      where("techUid", "==", uid),
       where("status", "==", "accepted")
     );
     const querySnapshot = await getDocs(q);
@@ -141,13 +146,13 @@ export const DBProvider = ({ children }) => {
     return requests;
   }
 
-  async function techWithdrawRequest(reqId) {
-    const docRef = doc(db, "requests", reqId);
+  async function techWithdrawRequest(uid, reqId) {
+    const docRef = doc(db, "users", uid, "requests", reqId);
 
     await runTransaction(db, async (transaction) => {
       transaction.update(docRef, {
         status: "new",
-        tech: "none",
+        techUid: "none",
         techEmail: "none",
       });
     });

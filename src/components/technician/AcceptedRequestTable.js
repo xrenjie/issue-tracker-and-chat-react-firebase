@@ -53,9 +53,9 @@ const AcceptedRequestTable = () => {
       rows.forEach((row) => {
         async function del() {
           try {
-            await techWithdrawRequest(row.reqId);
+            await techWithdrawRequest(row.uid, row.reqId);
           } catch (e) {
-            console.log(e);
+            alert("error withdrawing from request");
           }
         }
         del();

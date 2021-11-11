@@ -29,8 +29,8 @@ const Dashboard = () => {
   return (
     <>
       {role === "customer" ? (
-        <div className="mt-32 min-h-full flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
-          <div className="max-w-md w-full space-y-8 flex-col">
+        <div className="mt-32 lg:mx-60 min-h-full flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
+          <div className="w-full space-y-8 flex-col">
             <button
               className="border-2 px-2 border-black bg-blue-500 m-2 text-white"
               onClick={() => setShowRequest(true)}
@@ -40,13 +40,11 @@ const Dashboard = () => {
 
             {showRequest ? <Request setShowRequest={setShowRequest} /> : null}
           </div>
-          <div>
-            <RequestTable />
-          </div>
+          <RequestTable />
         </div>
       ) : (
-        <div className="mt-32 min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
-          <div className="max-w-md w-full space-y-8">
+        <div className="mt-32 lg:mx-60 min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
+          <div className="w-full space-y-8">
             <button
               className="border-2 px-2 border-black bg-blue-500 m-2 text-white"
               onClick={() => {

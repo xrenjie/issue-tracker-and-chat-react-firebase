@@ -11,10 +11,10 @@ const Request = ({ setShowRequest }) => {
   const handleSubmit = async (e) => {
     const request = {
       issue: issue,
-      user: user.uid,
+      uid: user.uid,
       status: "new",
       date: new Date(),
-      tech: "none",
+      techUid: "none",
       email: user.email,
       techEmail: "none",
     };

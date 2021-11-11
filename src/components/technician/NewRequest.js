@@ -14,24 +14,28 @@ const NewRequest = ({ setShowNewRequest }) => {
   const [request, setRequest] = useState();
   const [rawRequest, setRawRequest] = useState();
 
+  const sleep = (milliseconds) => {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  };
+
   useEffect(() => {
+    setLoading(true);
     async function getData() {
       if (role === "technician") {
         const r = await techGetNewRequest(user.uid);
-        if (!r) {
-          console.log("no new requests");
-        } else {
+        if (r) {
           setRequest(r.data());
           setRawRequest(r);
         }
       }
     }
     getData();
-  }, [role, user.uid]);
+    sleep(300).then(() => setLoading(false));
+  }, []);
 
   const handleAccept = async () => {
     setLoading(true);
-    await techAcceptRequest(user.uid, user.email, rawRequest.id);
+    await techAcceptRequest(user.uid, user.email, request.uid, rawRequest.id);
     setLoading(false);
     setShowNewRequest(false);
     setIsChanged(true);
@@ -39,7 +43,7 @@ const NewRequest = ({ setShowNewRequest }) => {
 
   const handleReject = async () => {
     setLoading(true);
-    await techRejectRequest(rawRequest.id);
+    await techRejectRequest(rawRequest.id, request.uid);
     setLoading(false);
     setShowNewRequest(false);
   };
@@ -69,6 +73,8 @@ const NewRequest = ({ setShowNewRequest }) => {
                         .join(" ")}
                     </p>
                   </>
+                ) : loading ? (
+                  <p>Loading...</p>
                 ) : (
                   <p>No new requests</p>
                 )}
