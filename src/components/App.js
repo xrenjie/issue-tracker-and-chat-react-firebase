@@ -10,6 +10,8 @@ import { AuthProvider } from "../contexts/AuthContext";
 import Account from "./Account";
 import { DBProvider } from "../contexts/DBContext";
 import Navbar from "./Navbar";
+import Chat from "./Chat";
+import ForgotPassword from "./ForgotPassword";
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
             <Route exact path="/login" element={<Login />} />
             <Route exact path="/signup" element={<Signup />} />
             <Route exact path="/techsignup" element={<TechSignup />} />
+            <Route exact path="/forgotpassword" element={<ForgotPassword />} />
             <Route
               exact
               path="/dashboard"
@@ -37,6 +40,15 @@ function App() {
               element={
                 <PrivateRoute>
                   <Account />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              exact
+              path="/chat"
+              element={
+                <PrivateRoute>
+                  <Chat />
                 </PrivateRoute>
               }
             />

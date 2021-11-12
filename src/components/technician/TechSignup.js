@@ -35,7 +35,7 @@ const TechSignup = () => {
       const u = await signup(email, password);
       const newuser = { uid: u.user.uid, role: "technician" };
       await newUser(newuser);
-      setRole("technician");
+      // setRole("technician");
       navigate("/dashboard");
     } catch (error) {
       alert("Failed to create account");

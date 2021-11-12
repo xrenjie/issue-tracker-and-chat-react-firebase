@@ -23,8 +23,8 @@ const Login = () => {
     try {
       setLoading(true);
       const u = await login(email, password);
-      const userType = await getUser(u.user.uid);
-      setRole(userType.role);
+      await getUser(u.user.uid);
+      // setRole(userType.role);
       setLoading(false);
       // if (role === "technician") {
       //   navigate("/tech");
@@ -100,12 +100,12 @@ const Login = () => {
             </div>
 
             <div className="text-sm">
-              <a
-                href="#"
+              <Link
+                to="/forgotpassword"
                 className="font-medium text-indigo-600 hover:text-indigo-500"
               >
                 Forgot your password?
-              </a>
+              </Link>
             </div>
           </div>
 

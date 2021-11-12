@@ -1,7 +1,7 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 
-const CustAccount = () => {
+const Account = () => {
   const { user, login, changePassword, changeEmail } = useAuth();
   const [email, setEmail] = useState(user.email);
   const [newPassword, setNewPassword] = useState("");
@@ -122,4 +122,4 @@ const CustAccount = () => {
   );
 };
 
-export default CustAccount;
+export default Account;

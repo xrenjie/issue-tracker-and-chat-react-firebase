@@ -9,10 +9,14 @@ const Request = ({ setShowRequest }) => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
+    if (issue === "") {
+      alert("Please enter a request");
+      return;
+    }
     const request = {
       issue: issue,
       uid: user.uid,
-      status: "new",
+      status: "New",
       date: new Date(),
       techUid: "none",
       email: user.email,
@@ -22,12 +26,13 @@ const Request = ({ setShowRequest }) => {
     try {
       setLoading(true);
       await addNewRequest(request);
-      setShowRequest(false);
       setLoading(false);
       setIsChanged(true);
+      setShowRequest(false);
     } catch (error) {
       console.log(error);
       setLoading(false);
+      setShowRequest(false);
     }
   };
 
@@ -41,30 +46,23 @@ const Request = ({ setShowRequest }) => {
               {/*header*/}
               <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
                 <h3 className="text-3xl font-semibold">New Support Request</h3>
-                <button
-                  className="p-1 ml-auto bg-transparent border-0  float-right text-3xl leading-none font-semibold outline-none focus:outline-none hover:bg-gray-200"
-                  onClick={() => setShowRequest(false)}
-                >
-                  <span className="bg-transparent text-red-600  h-6 w-6 text-2xl block outline-none focus:outline-none">
-                    ×
-                  </span>
-                </button>
               </div>
               {/*body*/}
               <div className="relative p-6 flex-auto">
                 <label htmlFor="issue" className="sr-only">
                   Issue
                 </label>
-                <input
+                <textarea
                   id="issue"
                   name="issue"
-                  type="text"
+                  type="textarea"
                   autoComplete="issue"
+                  rows={10}
                   onChange={(e) => setIssue(e.target.value)}
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Issue"
-                />
+                ></textarea>
               </div>
               {/*footer*/}
               <div className="flex items-center justify-end p-2 border-t border-solid border-blueGray-200 rounded-b">

@@ -35,7 +35,7 @@ const Signup = () => {
       const u = await signup(email, password);
       const newuser = { uid: u.user.uid, role: "customer" };
       await newUser(newuser);
-      setRole("customer");
+      // setRole("customer");
       setLoading(false);
       await navigate("/dashboard");
     } catch (error) {

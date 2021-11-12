@@ -9,7 +9,8 @@ const Home = () => {
       <div className="Home bg-blue-400 text-white">
         <div className="pt-24">
           <div className="container px-3 mx-auto flex flex-wrap flex-col md:flex-row items-center">
-            <div className="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left mb-32">
+            {/* <div className="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left mb-32"> */}
+            <div className="container flex flex-col items-center max-w-5xl md:w-2/5 md:text-left mx-auto m-8 md:items-start">
               <h1 className="my-4 text-5xl font-bold leading-tight">
                 Large or small, your business deserves reliable, professional
                 support for all your tech needs.
@@ -18,10 +19,10 @@ const Home = () => {
                 Technology is a part of your business. We can help you with
                 that.
               </h3>
-              <div className="flex gap-5 flex-wrap">
+              <div className="flex gap-5 flex-wrap sm:flex-row flex-col content-evenly">
                 <Link to="/techsignup">
                   <button className="bg-blue-800 rounded p-4 font-bold hover:bg-blue-900">
-                    Work with Us
+                    Become a Technician
                   </button>
                 </Link>
                 <Link to="/signup">
@@ -79,11 +80,11 @@ const Home = () => {
         </div>
       </div>
       <section id="about" className="bg-white text-black border-b py-8">
-        <div className="container max-w-5xl mx-auto m-8">
+        <div className="container flex flex-col items-center max-w-5xl mx-auto m-8 md:items-center">
           <h1 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
             About Us
           </h1>
-          <div className="flex flex-wrap items-center">
+          <div className="flex flex-wrap items-center md:flex-row flex-col">
             <div className="w-5/6 sm:w-1/2 p-6">
               <h3 className="text-3xl text-gray-800 font-bold leading-none mb-3">
                 What do we do?
@@ -102,7 +103,7 @@ const Home = () => {
               alt="computer desktop"
             />
           </div>
-          <div className="flex flex-wrap items-center">
+          <div className="flex flex-wrap items-center md:flex-row flex-col">
             <img
               src={computerjisakubunkai}
               className="w-full sm:w-1/2"
@@ -130,7 +131,7 @@ const Home = () => {
             Ready to get started?
           </h1>
 
-          <div className="flex flex-wrap gap-5 items-center my-10">
+          <div className="flex flex-wrap flex-col sm:flex-row gap-5 items-center my-10">
             <Link to="/techsignup">
               <button className="bg-blue-800 rounded p-4 font-bold hover:bg-blue-900 text-white">
                 Become a Technician

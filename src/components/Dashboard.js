@@ -2,63 +2,123 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import Request from "./customer/Request";
 import { useDB } from "../contexts/DBContext.js";
-import RequestTable from "./customer/RequestTable";
 import NewRequest from "./technician/NewRequest";
-import AcceptedRequestTable from "./technician/AcceptedRequestTable";
+import RequestCard from "./customer/RequestCard";
+import TechRequestCard from "./technician/TechRequestCard";
 
 const Dashboard = () => {
-  const { user, role, setRole } = useAuth();
-  const { getUser } = useDB();
-
+  const { user, role } = useAuth();
+  const {
+    getUser,
+    getRequests,
+    isChanged,
+    setIsChanged,
+    techGetAcceptedRequests,
+    techGetResolvedRequests,
+  } = useDB();
   const [showRequest, setShowRequest] = useState(false);
-
   const [showNewRequest, setShowNewRequest] = useState(false);
+  const [requests, setRequests] = useState([]);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [resolvedRequests, setResolvedRequests] = useState([]);
+
+  const statuses = {
+    New: 1,
+    Accepted: 0,
+    Resolved: 2,
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      if (user) {
-        const r = await getUser(user.uid);
-        setRole(r.role);
+    if (isChanged || firstLoad) {
+      async function fetchData() {
+        if (firstLoad) {
+          await getUser(user.uid);
+        }
+        if (role === "customer") {
+          await loadRequests();
+        } else if (role === "technician") {
+          await loadTechRequests();
+        }
       }
+      fetchData();
+      setIsChanged(false);
+      setFirstLoad(false);
     }
-    fetchData();
-  });
+  }, [isChanged, firstLoad]);
 
-  const getRequest = async () => {};
+  const loadRequests = async () => {
+    let req = [];
+    req = await getRequests(user.uid);
+    req.map((r) => {
+      let k = r;
+      k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
+      return k;
+    });
+    req.sort((a, b) => {
+      return statuses[a.status] - statuses[b.status];
+    });
+    setRequests(req);
+  };
+
+  const loadTechRequests = async () => {
+    let req = [];
+    let resReq = [];
+    req = await techGetAcceptedRequests(user.uid);
+    resReq = await techGetResolvedRequests(user.uid);
+    req.map((r) => {
+      let k = r;
+      k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
+      return k;
+    });
+    resReq.map((r) => {
+      let k = r;
+      k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
+      return k;
+    });
+    setRequests(req);
+    setResolvedRequests(resReq);
+  };
 
   return (
     <>
       {role === "customer" ? (
-        <div className="mt-32 lg:mx-60 min-h-full flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
-          <div className="w-full space-y-8 flex-col">
+        <div className="mt-8 flex-col lg:mx-60 min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
+          <div className="w-full flex-col">
             <button
-              className="border-2 px-2 border-black bg-blue-500 m-2 text-white"
+              className="bg-blue-500 text-white hover:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
               onClick={() => setShowRequest(true)}
             >
               New Request
             </button>
-
-            {showRequest ? <Request setShowRequest={setShowRequest} /> : null}
+            {requests.map((req) => {
+              return <RequestCard key={req.reqId} request={req} />;
+            })}
           </div>
-          <RequestTable />
+
+          {showRequest ? <Request setShowRequest={setShowRequest} /> : null}
         </div>
       ) : (
-        <div className="mt-32 lg:mx-60 min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
-          <div className="w-full space-y-8">
+        <div className="mt-8 flex-col lg:mx-60 min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
+          <div className="w-full flex-col">
             <button
-              className="border-2 px-2 border-black bg-blue-500 m-2 text-white"
+              className="bg-blue-500 text-white hover:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
               onClick={() => {
-                getRequest();
                 setShowNewRequest(true);
               }}
             >
               Get New Request
             </button>
-            {showNewRequest ? (
-              <NewRequest setShowNewRequest={setShowNewRequest} />
-            ) : null}
-            <AcceptedRequestTable />
+
+            {requests.map((req) => {
+              return <TechRequestCard key={req.reqId} request={req} />;
+            })}
+            {resolvedRequests.map((req) => {
+              return <TechRequestCard key={req.reqId} request={req} />;
+            })}
           </div>
+          {showNewRequest ? (
+            <NewRequest setShowNewRequest={setShowNewRequest} />
+          ) : null}
         </div>
       )}
     </>

@@ -12,7 +12,6 @@ const NewRequest = ({ setShowNewRequest }) => {
   } = useDB();
   const [loading, setLoading] = useState(false);
   const [request, setRequest] = useState();
-  const [rawRequest, setRawRequest] = useState();
 
   const sleep = (milliseconds) => {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -24,8 +23,7 @@ const NewRequest = ({ setShowNewRequest }) => {
       if (role === "technician") {
         const r = await techGetNewRequest(user.uid);
         if (r) {
-          setRequest(r.data());
-          setRawRequest(r);
+          setRequest(r);
         }
       }
     }
@@ -35,15 +33,15 @@ const NewRequest = ({ setShowNewRequest }) => {
 
   const handleAccept = async () => {
     setLoading(true);
-    await techAcceptRequest(user.uid, user.email, request.uid, rawRequest.id);
+    await techAcceptRequest(user, request);
     setLoading(false);
-    setShowNewRequest(false);
     setIsChanged(true);
+    setShowNewRequest(false);
   };
 
   const handleReject = async () => {
     setLoading(true);
-    await techRejectRequest(rawRequest.id, request.uid);
+    await techRejectRequest(request);
     setLoading(false);
     setShowNewRequest(false);
   };
@@ -63,14 +61,32 @@ const NewRequest = ({ setShowNewRequest }) => {
               <div className="relative p-6 flex-auto">
                 {request ? (
                   <>
-                    <p>Issue: {request.issue}</p>
-                    <p>Requester: {request.email}</p>
-                    <p>
-                      Date Requested:{" "}
+                    <p className="border-b mb-2 pb-2 text-sm">
+                      Date requested:{" "}
                       {String(request.date.toDate())
                         .split(" ")
                         .slice(0, 4)
                         .join(" ")}
+                    </p>
+
+                    <p className="border-b mb-2 pb-2 ">
+                      Issue: {request.issue}
+                    </p>
+
+                    <p className="border-b mb-2 pb-2">
+                      Requester: {request.email}
+                    </p>
+
+                    <p
+                      className={
+                        request.status === "New"
+                          ? "text-blue-700 mb-2 pb-2"
+                          : request.status === "Accepted"
+                          ? "text-green-700"
+                          : "text-black"
+                      }
+                    >
+                      {request.status}
                     </p>
                   </>
                 ) : loading ? (
