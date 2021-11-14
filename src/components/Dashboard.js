@@ -10,7 +10,7 @@ const Dashboard = () => {
   const { user, role } = useAuth();
   const {
     getUser,
-    getNewOrResolvedRequests,
+    getNewRequests,
     isChanged,
     setIsChanged,
     techGetAcceptedRequests,
@@ -35,9 +35,10 @@ const Dashboard = () => {
         }
         if (role === "customer") {
           await loadRequests();
-        } else if (role === "technician") {
-          await loadTechRequests();
         }
+        // else if (role === "technician") {
+        //   await loadTechRequests();
+        // }
       }
       fetchData();
       setIsChanged(false);
@@ -47,7 +48,7 @@ const Dashboard = () => {
 
   const loadRequests = async () => {
     let req = [];
-    req = await getNewOrResolvedRequests(user.uid);
+    req = await getNewRequests(user.uid);
     req.map((r) => {
       let k = r;
       k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
@@ -74,7 +75,7 @@ const Dashboard = () => {
   return (
     <>
       {role === "customer" ? (
-        <div className="mt-8 flex-col lg:mx-60 min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
+        <div className="mt-8 lg:mx-40 min-h-full items-center justify-center pt-12 pb-8 px-4 sm:px-6 lg:px-8">
           <div className="w-full flex-col">
             <button
               className="bg-blue-500 text-white hover:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -83,11 +84,24 @@ const Dashboard = () => {
               New Request
             </button>
             {requests.map((req) => {
-              return <RequestCard key={req.reqId} request={req} />;
+              return (
+                <RequestCard
+                  key={req.reqId}
+                  request={req}
+                  requests={requests}
+                  setRequests={setRequests}
+                />
+              );
             })}
           </div>
 
-          {showRequest ? <Request setShowRequest={setShowRequest} /> : null}
+          {showRequest ? (
+            <Request
+              setShowRequest={setShowRequest}
+              setRequests={setRequests}
+              requests={requests}
+            />
+          ) : null}
         </div>
       ) : (
         <div className="mt-8 flex-col lg:mx-60 min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 z-[-1] relative">
@@ -101,12 +115,18 @@ const Dashboard = () => {
               Get New Request
             </button>
 
-            {requests.map((req) => {
-              return <TechRequestCard key={req.reqId} request={req} />;
-            })}
+            {/* {requests.length > 0
+              ? requests.map((req) => {
+                  return <TechRequestCard key={req.reqId} request={req} />;
+                })
+              : "No new requests"} */}
           </div>
           {showNewRequest ? (
-            <NewRequest setShowNewRequest={setShowNewRequest} />
+            <NewRequest
+              setShowNewRequest={setShowNewRequest}
+              setRequests={setRequests}
+              requests={requests}
+            />
           ) : null}
         </div>
       )}

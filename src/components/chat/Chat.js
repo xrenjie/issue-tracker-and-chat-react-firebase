@@ -6,11 +6,10 @@ import Chatbox from "./Chatbox";
 const Chat = () => {
   const {
     getUser,
-    chatPartner,
-    setChatPartner,
     getAcceptedRequests,
+    getResolvedRequests,
     isChanged,
-    setIsChanged,
+    setChatChanged,
     techGetAcceptedRequests,
   } = useDB();
   const { user, role } = useAuth();
@@ -18,26 +17,8 @@ const Chat = () => {
   const [requests, setRequests] = useState([]);
   const [firstLoad, setFirstLoad] = useState(true);
 
-  // useEffect(() => {
-  //   if (isChanged || firstLoad) {
-  //     async function fetchData() {
-  //       if (firstLoad) {
-  //         await getUser(user.uid);
-  //       }
-  //       if (role === "customer") {
-  //         await loadRequests();
-  //       } else if (role === "technician") {
-  //         await loadTechRequests();
-  //       }
-  //     }
-  //     fetchData();
-  //     setIsChanged(false);
-  //     setFirstLoad(false);
-  //   }
-  // }, [isChanged, firstLoad]);
-
   useEffect(() => {
-    if (isChanged || firstLoad) {
+    if (firstLoad) {
       async function getRequests() {
         if (firstLoad) {
           await getUser(user.uid);
@@ -49,13 +30,13 @@ const Chat = () => {
         }
       }
       getRequests();
-      setIsChanged(false);
+      //setIsChanged(false);
       setFirstLoad(false);
     }
-  }, [isChanged, firstLoad]);
+  }, [firstLoad]);
 
   const loadRequests = async () => {
-    console.log(" load requests ");
+    console.log(" load requests customer ");
     let req = [];
     req = await getAcceptedRequests(user.uid);
     req.map((r) => {
@@ -63,12 +44,18 @@ const Chat = () => {
       k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
       return k;
     });
+    let req2 = await getResolvedRequests(user.uid);
+    req2.map((r) => {
+      let k = r;
+      k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
+      return k;
+    });
 
-    setRequests(req);
+    setRequests(req.concat(req2));
   };
 
   const loadTechRequests = async () => {
-    console.log(" load requests ");
+    console.log(" load requests tech ");
     let req = [];
     req = await techGetAcceptedRequests(user.uid);
     req.map((r) => {
@@ -82,25 +69,40 @@ const Chat = () => {
 
   const handleClickRequest = async (request) => {
     setCurrentRequest(request);
-    setIsChanged(true);
+    setChatChanged(true);
+    //setIsChanged(true);
   };
 
   return (
     <div className="flex flex-row flex-auto pt-14 h-screen w-screen">
-      <div className="border-r shadow w-72 overflow-auto flex-shrink-0 pl-2">
-        {requests.map((r) => (
-          <div
-            className="border-b"
-            key={r.reqId}
-            onClick={() => handleClickRequest(r)}
-          >
-            <p className="text-sm">{r.techEmail}</p>
-            <p>{r.issue.split(" ").slice(0, 10).join(" ")}</p>
-            <p className="text-sm">{r.date}</p>
-          </div>
-        ))}
+      <div className="border-r w-44 break-words sm:w-72 overflow-auto flex-shrink-0">
+        {requests.map((r) => {
+          return r ? (
+            <div
+              className={
+                currentRequest
+                  ? r.reqId === currentRequest.reqId
+                    ? r.status === "Accepted"
+                      ? " bg-gray-200 rounded cursor-pointer p-2 m-2 "
+                      : " bg-green-200 rounded cursor-pointer p-2 m-2 text-gray-700"
+                    : r.status === "Accepted"
+                    ? " bg-gray-100 hover:bg-gray-200 rounded cursor-pointer p-2 m-2"
+                    : " bg-green-100 hover:bg-green-200 rounded cursor-pointer p-2 m-2 text-gray-700"
+                  : " bg-gray-100 hover:bg-gray-200 rounded cursor-pointer p-2 m-2"
+              }
+              key={r.reqId}
+              onClick={() => handleClickRequest(r)}
+            >
+              <p>{r.issue.split(" ").slice(0, 10).join(" ")}</p>
+              <p className="text-xs font-semibold">
+                {role === "customer" ? r.techEmail : r.email}
+              </p>
+              <p className="text-xs">{r.date}</p>
+            </div>
+          ) : null;
+        })}
       </div>
-      <div className="container h-full w-full overflow-auto">
+      <div className="w-full h-full">
         {currentRequest ? <Chatbox request={currentRequest} /> : null}
       </div>
     </div>

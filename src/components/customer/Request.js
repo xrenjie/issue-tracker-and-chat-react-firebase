@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDB } from "../../contexts/DBContext";
 
-const Request = ({ setShowRequest }) => {
+const Request = ({ setShowRequest, setRequests, requests }) => {
   const { user } = useAuth();
   const [issue, setIssue] = useState("");
   const { addNewRequest, setIsChanged } = useDB();
@@ -13,7 +13,7 @@ const Request = ({ setShowRequest }) => {
       alert("Please enter a request");
       return;
     }
-    const request = {
+    let request = {
       issue: issue,
       uid: user.uid,
       status: "New",
@@ -25,9 +25,11 @@ const Request = ({ setShowRequest }) => {
 
     try {
       setLoading(true);
-      await addNewRequest(request);
+      const reqId = await addNewRequest(request);
+      request.date = String(request.date).split(" ").slice(0, 4).join(" ");
+      request.reqId = reqId;
+      setRequests([request, ...requests]);
       setLoading(false);
-      setIsChanged(true);
       setShowRequest(false);
     } catch (error) {
       console.log(error);

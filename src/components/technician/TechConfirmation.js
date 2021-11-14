@@ -6,6 +6,8 @@ const TechConfirmation = ({
   setShowConfirmation,
   request,
   confirmationType,
+  requests,
+  setRequests,
 }) => {
   const { techWithdrawRequest, techResolveRequest } = useDB();
   const { setIsChanged } = useDB();
@@ -23,7 +25,7 @@ const TechConfirmation = ({
     try {
       setLoading(true);
       await techResolveRequest(request);
-      setIsChanged(true);
+      // setIsChanged(true);
       setLoading(false);
       setShowConfirmation(false);
     } catch (e) {
@@ -37,7 +39,7 @@ const TechConfirmation = ({
     try {
       setLoading(true);
       await techWithdrawRequest(request);
-      setIsChanged(true);
+      // setIsChanged(true);
       setLoading(false);
       setShowConfirmation(false);
     } catch (e) {

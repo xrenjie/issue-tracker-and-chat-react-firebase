@@ -14,6 +14,7 @@ import {
   setDoc,
   getDoc,
   collectionGroup,
+  updateDoc,
 } from "firebase/firestore";
 import { useAuth } from "./AuthContext";
 
@@ -26,7 +27,7 @@ export function useDB() {
 export const DBProvider = ({ children }) => {
   const { setRole } = useAuth();
   const [isChanged, setIsChanged] = useState(false);
-  const [chatPartner, setChatPartner] = useState(null);
+  const [chatChanged, setChatChanged] = useState(false);
   const [newRequests, setNewRequests] = useState([]);
   const [acceptedRequests, setAcceptedRequests] = useState([]);
   const [resolvedRequests, setResolvedRequests] = useState([]);
@@ -40,11 +41,13 @@ export const DBProvider = ({ children }) => {
     return docRef.id;
   }
 
-  async function getNewOrResolvedRequests(uid) {
+  async function getNewRequests(uid) {
+    console.log("get new requests");
     let requests = [];
     const q = query(
       collection(db, "users", uid, "requests"),
-      where("status", "==", "New")
+      where("status", "==", "New"),
+      orderBy("date", "desc")
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -52,9 +55,16 @@ export const DBProvider = ({ children }) => {
       r.reqId = doc.id;
       requests = [...requests, r];
     });
+
+    return requests;
+  }
+
+  async function getResolvedRequests(uid) {
+    let requests = [];
     const q2 = query(
       collection(db, "users", uid, "requests"),
-      where("status", "==", "Resolved")
+      where("status", "==", "Resolved"),
+      orderBy("lastMessage", "desc")
     );
     const querySnapshot2 = await getDocs(q2);
     querySnapshot2.forEach((doc) => {
@@ -69,7 +79,8 @@ export const DBProvider = ({ children }) => {
     let requests = [];
     const q = query(
       collection(db, "users", uid, "requests"),
-      where("status", "==", "Accepted")
+      where("status", "==", "Accepted"),
+      orderBy("lastMessage", "desc")
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -85,7 +96,7 @@ export const DBProvider = ({ children }) => {
     const q = query(
       collection(db, "users", customerUid, "requests", requestId, "messages"),
       orderBy("date", "desc"),
-      limit(10)
+      limit(20)
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -94,7 +105,6 @@ export const DBProvider = ({ children }) => {
       m.id = doc.id;
       messages = [...messages, m];
     });
-    console.log(messages);
     return messages;
   }
 
@@ -103,6 +113,14 @@ export const DBProvider = ({ children }) => {
       collection(db, "users", customerUid, "requests", requestId, "messages"),
       { message: message, date: new Date(), email: author }
     );
+    const requestDocRef = await doc(
+      db,
+      "users",
+      customerUid,
+      "requests",
+      requestId
+    );
+    await updateDoc(requestDocRef, { lastMessage: new Date() });
     return docRef.id;
   }
 
@@ -119,7 +137,7 @@ export const DBProvider = ({ children }) => {
       role: user.role,
     });
     setRole(user.role);
-    setIsChanged(true);
+    // setIsChanged(true);
     return docRef.id;
   }
 
@@ -160,7 +178,6 @@ export const DBProvider = ({ children }) => {
   }
 
   async function techRejectRequest(req) {
-    console.log("ererer", req.reqId);
     const docRef = doc(db, "users", req.uid, "requests", req.reqId);
 
     await runTransaction(db, async (transaction) => {
@@ -180,6 +197,7 @@ export const DBProvider = ({ children }) => {
         status: "Accepted",
         techUid: user.uid,
         techEmail: user.email,
+        lastMessage: new Date(),
       });
     });
   }
@@ -189,7 +207,8 @@ export const DBProvider = ({ children }) => {
     const q = query(
       collectionGroup(db, "requests"),
       where("techUid", "==", uid),
-      where("status", "==", "Resolved")
+      where("status", "==", "Resolved"),
+      orderBy("lastMessage", "desc")
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -205,7 +224,8 @@ export const DBProvider = ({ children }) => {
     const q = query(
       collectionGroup(db, "requests"),
       where("techUid", "==", uid),
-      where("status", "==", "Accepted")
+      where("status", "==", "Accepted"),
+      orderBy("lastMessage", "desc")
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -240,11 +260,14 @@ export const DBProvider = ({ children }) => {
 
   const value = {
     addNewRequest,
-    getNewOrResolvedRequests,
+    getNewRequests,
     getAcceptedRequests,
+    getResolvedRequests,
     deleteRequest,
     isChanged,
     setIsChanged,
+    chatChanged,
+    setChatChanged,
     newUser,
     getUser,
     techGetNewRequest,
@@ -254,8 +277,6 @@ export const DBProvider = ({ children }) => {
     techGetAcceptedRequests,
     techWithdrawRequest,
     techResolveRequest,
-    chatPartner,
-    setChatPartner,
     getMessages,
     sendMessage,
   };

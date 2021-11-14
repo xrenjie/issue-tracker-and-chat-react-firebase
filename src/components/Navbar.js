@@ -53,7 +53,7 @@ const Navbar = () => {
             </Link>
           </div>
         )}
-        <div className="block m-1 lg:hidden pr-4">
+        <div className="block m-1 lg:hidden pr-4 self-end">
           <button
             id="nav-toggle"
             className="flex items-center p-1 text-white hover:text-gray-900 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
@@ -71,10 +71,10 @@ const Navbar = () => {
         </div>
 
         <div
-          className="w-full bg-blue-500 hidden flex-grow lg:flex lg:items-center lg:w-auto mt-2 lg:mt-0 lg:bg-transparent text-black p-4 lg:p-0 z-20"
+          className="w-full self-end bg-blue-500 hidden flex-grow lg:flex lg:items-center lg:w-auto mt-2 lg:mt-0 lg:bg-transparent text-black p-4 lg:p-0 z-20"
           id="nav-content"
         >
-          <ul className="list-reset lg:flex justify-end flex-1 items-center">
+          <ul className="lg:flex justify-end flex-1 items-center">
             {user === null ? (
               <>
                 <li className="mr-3">

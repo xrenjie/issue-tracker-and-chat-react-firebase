@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDB } from "../../contexts/DBContext";
 
-const NewRequest = ({ setShowNewRequest }) => {
+const NewRequest = ({ setShowNewRequest, requests, setRequests }) => {
   const { user, role } = useAuth();
   const {
     techGetNewRequest,
@@ -29,14 +29,20 @@ const NewRequest = ({ setShowNewRequest }) => {
     }
     getData();
     sleep(300).then(() => setLoading(false));
+
+    return function cleanup() {
+      setShowNewRequest(false);
+    };
   }, []);
 
   const handleAccept = async () => {
     setLoading(true);
     await techAcceptRequest(user, request);
     setLoading(false);
-    setIsChanged(true);
-    setShowNewRequest(false);
+    let r = request;
+    r.date = String(request.date).split(" ").slice(0, 4).join(" ");
+    setRequests([r, ...requests]);
+    // setIsChanged(true);
   };
 
   const handleReject = async () => {
