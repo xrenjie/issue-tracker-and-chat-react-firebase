@@ -10,7 +10,7 @@ const Dashboard = () => {
   const { user, role } = useAuth();
   const {
     getUser,
-    getRequests,
+    getNewOrResolvedRequests,
     isChanged,
     setIsChanged,
     techGetAcceptedRequests,
@@ -20,7 +20,6 @@ const Dashboard = () => {
   const [showNewRequest, setShowNewRequest] = useState(false);
   const [requests, setRequests] = useState([]);
   const [firstLoad, setFirstLoad] = useState(true);
-  const [resolvedRequests, setResolvedRequests] = useState([]);
 
   const statuses = {
     New: 1,
@@ -48,7 +47,7 @@ const Dashboard = () => {
 
   const loadRequests = async () => {
     let req = [];
-    req = await getRequests(user.uid);
+    req = await getNewOrResolvedRequests(user.uid);
     req.map((r) => {
       let k = r;
       k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
@@ -62,21 +61,14 @@ const Dashboard = () => {
 
   const loadTechRequests = async () => {
     let req = [];
-    let resReq = [];
     req = await techGetAcceptedRequests(user.uid);
-    resReq = await techGetResolvedRequests(user.uid);
     req.map((r) => {
       let k = r;
       k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
       return k;
     });
-    resReq.map((r) => {
-      let k = r;
-      k.date = String(k.date.toDate()).split(" ").slice(0, 4).join(" ");
-      return k;
-    });
+
     setRequests(req);
-    setResolvedRequests(resReq);
   };
 
   return (
@@ -110,9 +102,6 @@ const Dashboard = () => {
             </button>
 
             {requests.map((req) => {
-              return <TechRequestCard key={req.reqId} request={req} />;
-            })}
-            {resolvedRequests.map((req) => {
               return <TechRequestCard key={req.reqId} request={req} />;
             })}
           </div>

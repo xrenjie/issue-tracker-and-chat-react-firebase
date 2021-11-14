@@ -22,17 +22,6 @@ const TechRequestCard = ({ request }) => {
 
   return (
     <div className="flex flex-col container border rounded shadow-md my-2 px-4 py-2">
-      {request.status !== "Resolved" ? (
-        <Link
-          className="bg-green-500 text-white self-start hover:bg-green-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-          type="button"
-          onClick={() => setChatPartner(request.uid)}
-          to="/chat"
-        >
-          Chat
-        </Link>
-      ) : null}
-
       <p className="border-b-2 mb-2 pb-2 text-sm">{request.date}</p>
 
       <div className="border-b-2 mb-2 pb-2 ">

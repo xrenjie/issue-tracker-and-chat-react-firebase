@@ -1,7 +1,7 @@
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useDB } from "../contexts/DBContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useDB } from "../../contexts/DBContext";
 
 const Signup = () => {
   const { newUser } = useDB();

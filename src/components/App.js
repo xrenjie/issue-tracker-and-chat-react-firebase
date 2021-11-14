@@ -1,17 +1,17 @@
 import "../App.css";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import Home from "./Home";
-import TechSignup from "./technician/TechSignup";
-import Signup from "./Signup";
-import Login from "./Login";
+import TechSignup from "./login/TechSignup";
+import Signup from "./login/Signup";
+import Login from "./login/Login";
 import Dashboard from "./Dashboard";
 import PrivateRoute from "./PrivateRoute";
 import { AuthProvider } from "../contexts/AuthContext";
 import Account from "./Account";
 import { DBProvider } from "../contexts/DBContext";
 import Navbar from "./Navbar";
-import Chat from "./Chat";
-import ForgotPassword from "./ForgotPassword";
+import Chat from "./chat/Chat";
+import ForgotPassword from "./login/ForgotPassword";
 
 function App() {
   return (
@@ -45,7 +45,7 @@ function App() {
             />
             <Route
               exact
-              path="/chat"
+              path="dashboard/chat"
               element={
                 <PrivateRoute>
                   <Chat />

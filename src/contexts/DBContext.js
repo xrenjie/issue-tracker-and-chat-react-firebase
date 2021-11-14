@@ -27,6 +27,9 @@ export const DBProvider = ({ children }) => {
   const { setRole } = useAuth();
   const [isChanged, setIsChanged] = useState(false);
   const [chatPartner, setChatPartner] = useState(null);
+  const [newRequests, setNewRequests] = useState([]);
+  const [acceptedRequests, setAcceptedRequests] = useState([]);
+  const [resolvedRequests, setResolvedRequests] = useState([]);
   // const [requests, setRequests] = useState([]);
 
   async function addNewRequest(request) {
@@ -37,17 +40,70 @@ export const DBProvider = ({ children }) => {
     return docRef.id;
   }
 
-  async function getRequests(uid) {
+  async function getNewOrResolvedRequests(uid) {
     let requests = [];
-    const q = query(collection(db, "users", uid, "requests"));
+    const q = query(
+      collection(db, "users", uid, "requests"),
+      where("status", "==", "New")
+    );
     const querySnapshot = await getDocs(q);
-    console.log(querySnapshot.docs);
+    querySnapshot.forEach((doc) => {
+      let r = doc.data();
+      r.reqId = doc.id;
+      requests = [...requests, r];
+    });
+    const q2 = query(
+      collection(db, "users", uid, "requests"),
+      where("status", "==", "Resolved")
+    );
+    const querySnapshot2 = await getDocs(q2);
+    querySnapshot2.forEach((doc) => {
+      let r = doc.data();
+      r.reqId = doc.id;
+      requests = [...requests, r];
+    });
+    return requests;
+  }
+
+  async function getAcceptedRequests(uid) {
+    let requests = [];
+    const q = query(
+      collection(db, "users", uid, "requests"),
+      where("status", "==", "Accepted")
+    );
+    const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       let r = doc.data();
       r.reqId = doc.id;
       requests = [...requests, r];
     });
     return requests;
+  }
+
+  async function getMessages(customerUid, requestId) {
+    let messages = [];
+    const q = query(
+      collection(db, "users", customerUid, "requests", requestId, "messages"),
+      orderBy("date", "desc"),
+      limit(10)
+    );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let m = doc.data();
+      m.date = String(m.date.toDate());
+      m.id = doc.id;
+      messages = [...messages, m];
+    });
+    console.log(messages);
+    return messages;
+  }
+
+  async function sendMessage(customerUid, requestId, message, author) {
+    const docRef = await addDoc(
+      collection(db, "users", customerUid, "requests", requestId, "messages"),
+      { message: message, date: new Date(), email: author }
+    );
+    return docRef.id;
   }
 
   async function deleteRequest(req) {
@@ -184,7 +240,8 @@ export const DBProvider = ({ children }) => {
 
   const value = {
     addNewRequest,
-    getRequests,
+    getNewOrResolvedRequests,
+    getAcceptedRequests,
     deleteRequest,
     isChanged,
     setIsChanged,
@@ -199,6 +256,8 @@ export const DBProvider = ({ children }) => {
     techResolveRequest,
     chatPartner,
     setChatPartner,
+    getMessages,
+    sendMessage,
   };
 
   return <DBContext.Provider value={value}>{children}</DBContext.Provider>;
